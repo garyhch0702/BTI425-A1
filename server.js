@@ -1,17 +1,17 @@
 /********************************************************************************
-*  BTI425 – Assignment 1
-*  
-*  I declare that this assignment is my own work in accordance with Seneca's
-*  Academic Integrity Policy:
-*  
-*  https://www.senecapolytechnic.ca/about/policies/academic-integrity-policy.html
-*  
-*  Name: Chenghao Hu
-*  Student ID: 149773228
-*  Date: January 16, 2025
-*  
-*  Published URL: ___________________________________________________________
-********************************************************************************/
+ *  BTI425 – Assignment 1
+ *  
+ *  I declare that this assignment is my own work in accordance with Seneca's
+ *  Academic Integrity Policy:
+ *  
+ *  https://www.senecapolytechnic.ca/about/policies/academic-integrity-policy.html
+ *  
+ *  Name: Chenghao Hu
+ *  Student ID: 149773228
+ *  Date: January 17, 2025
+ *  
+ *  Published URL: ___________________________________________________________
+ ********************************************************************************/
 
 const express = require("express");
 const cors = require("cors");
@@ -19,6 +19,7 @@ const dotenv = require("dotenv");
 const ListingsDB = require("./modules/listingsDB");
 
 dotenv.config();
+
 const app = express();
 const HTTP_PORT = process.env.PORT || 8080;
 
@@ -29,6 +30,8 @@ const db = new ListingsDB();
 
 db.initialize(process.env.MONGODB_CONN_STRING)
     .then(() => {
+        console.log("Database connection successful");
+
         app.listen(HTTP_PORT, () => {
             console.log(`Server running on port ${HTTP_PORT}`);
         });
@@ -36,6 +39,10 @@ db.initialize(process.env.MONGODB_CONN_STRING)
     .catch((err) => {
         console.error("Failed to connect to database:", err);
     });
+
+app.get("/", (req, res) => {
+    res.send("Welcome to BTI425 Assignment 1 API!");
+});
 
 app.post("/api/listings", async (req, res) => {
     try {
@@ -49,7 +56,7 @@ app.post("/api/listings", async (req, res) => {
 app.get("/api/listings", async (req, res) => {
     try {
         const { page = 1, perPage = 5, name } = req.query;
-        const listings = await db.getAllListings(+page, +perPage, name);
+        const listings = await db.getAllListings(parseInt(page), parseInt(perPage), name);
         res.json(listings);
     } catch (err) {
         res.status(500).json({ error: err.message });
@@ -84,4 +91,8 @@ app.delete("/api/listings/:id", async (req, res) => {
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
+});
+
+app.use((req, res) => {
+    res.status(404).json({ error: "Route not found" });
 });
