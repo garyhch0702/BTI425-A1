@@ -3,10 +3,10 @@ const Listing = require("./listingSchema");
 
 class ListingsDB {
     async initialize(connectionString) {
-        await mongoose.connect(connectionString);
+        await mongoose.connect(connectionString, { useNewUrlParser: true, useUnifiedTopology: true });
         console.log("Database connection successful");
     }
-    
+
     async addNewListing(data) {
         const listing = new Listing(data);
         return listing.save();
